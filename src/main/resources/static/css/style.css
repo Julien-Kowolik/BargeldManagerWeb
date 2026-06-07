@@ -136,6 +136,11 @@ body {
     padding: 0 48px 28px;
 }
 
+.hero-compact {
+    padding-top: 10px;
+    padding-bottom: 18px;
+}
+
 .stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -298,6 +303,7 @@ table {
     background: rgba(255,255,255,0.42);
     border-radius: 14px;
     overflow: hidden;
+    table-layout: auto;
 }
 
 th,
@@ -309,6 +315,87 @@ td {
 
 th {
     background: rgba(219,234,254,0.75);
+}
+
+.summary-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.summary-card {
+    background: rgba(239, 248, 255, 0.76);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.55);
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0, 60, 150, 0.12);
+    padding: 18px 20px;
+}
+
+.summary-card small {
+    display: block;
+    color: #2563eb;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.summary-card strong {
+    font-size: 24px;
+    color: #0042b8;
+}
+
+.table-panel {
+    padding: 22px;
+}
+
+.panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.panel-head h2 {
+    margin: 0;
+}
+
+.panel-head p {
+    margin: 6px 0 0;
+    color: #4f83d1;
+}
+
+.table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll table {
+    min-width: 720px;
+}
+
+.amount {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.empty-state {
+    padding: 28px 20px;
+    border: 1px dashed rgba(37,99,235,0.25);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.32);
+}
+
+.empty-state strong {
+    display: block;
+    margin-bottom: 6px;
+    color: #0042b8;
+}
+
+.empty-state p {
+    margin: 0;
+    color: #4f83d1;
 }
 
 form {
@@ -346,48 +433,7 @@ button:hover,
     filter: brightness(0.95);
 }
 
-@media (max-width: 950px) {
-    .app {
-        display: block;
-    }
-
-    .sidebar {
-        position: static;
-        width: 100%;
-        min-height: auto;
-    }
-
-    .sidebar-bottom {
-        position: static;
-        margin-top: 20px;
-    }
-
-    .main {
-        margin-left: 0;
-        width: 100%;
-    }
-
-    .hero {
-        flex-direction: column;
-        text-align: center;
-        padding: 30px 20px;
-    }
-
-    .hero h1 {
-        font-size: 40px;
-    }
-
-    .stats,
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .content {
-        padding: 0 18px 24px;
-    }
-}
 @media (max-width: 900px) {
-
     .app {
         display: flex;
         flex-direction: column;
@@ -449,6 +495,10 @@ button:hover,
         padding: 15px;
     }
 
+    .summary-strip {
+        grid-template-columns: 1fr;
+    }
+
     .stat-card {
         width: 100%;
     }
@@ -463,8 +513,38 @@ button:hover,
         padding: 16px;
     }
 
-    table {
-        display: block;
-        overflow-x: auto;
+    .table-panel {
+        padding: 16px;
+    }
+
+    .panel-head {
+        flex-direction: column;
+    }
+
+    .table-scroll table {
+        min-width: 620px;
+    }
+}
+
+@media (max-width: 640px) {
+    .hero h1 {
+        font-size: 32px;
+    }
+
+    .hero p {
+        font-size: 17px;
+    }
+
+    .sidebar nav {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-card strong {
+        font-size: 20px;
+    }
+
+    th,
+    td {
+        padding: 12px;
     }
 }

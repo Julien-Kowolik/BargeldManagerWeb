@@ -2,8 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Transaktionen</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaktionen</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
 <div class="app">
     <aside class="sidebar">
         <div class="sidebar-logo">
-            <img src="/images/logo.png" alt="Logo">
+            <img src="/images/logo.png" alt="BargeldManager Logo">
             <h2>Bargeld<span>Manager</span></h2>
         </div>
 
@@ -38,34 +38,65 @@
             <div class="user-badge">📋 Transaktionen</div>
         </div>
 
-        <section class="hero">
-            <img src="/images/logo.png" alt="Logo">
+        <section class="hero hero-compact">
+            <img src="/images/logo.png" alt="BargeldManager Logo">
             <div>
                 <h1>Alle <span>Transaktionen</span></h1>
-                <p>Alle Einnahmen und Ausgaben im Überblick.</p>
+                <p>Einnahmen und Ausgaben im direkten Überblick.</p>
             </div>
         </section>
 
         <div class="content">
-            <section class="card">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Datum</th>
-                        <th>Typ</th>
-                        <th>Kategorie</th>
-                        <th>Wert</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="t : ${transaktionen}">
-                        <td th:text="${#temporals.format(t.datum, 'dd.MM.yyyy HH:mm')}">01.01.2026</td>
-                        <td th:text="${t.typ}">EINNAHME</td>
-                        <td th:text="${t.kathegorie.anzeigeName}">Gehalt</td>
-                        <td th:text="${werte[t.id]} + ' €'">0 €</td>
-                    </tr>
-                    </tbody>
-                </table>
+            <section class="summary-strip">
+                <div class="summary-card">
+                    <small>Einträge</small>
+                    <strong th:text="${#lists.size(transaktionen)}">0</strong>
+                </div>
+                <div class="summary-card">
+                    <small>Status</small>
+                    <strong>Aktuelle Liste</strong>
+                </div>
+                <div class="summary-card">
+                    <small>Ansicht</small>
+                    <strong>Mobil optimiert</strong>
+                </div>
+            </section>
+
+            <section class="card table-panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>Transaktionsliste</h2>
+                        <p>Die Beträge sind bereits nach Typ und Betrag aufbereitet.</p>
+                    </div>
+                </div>
+
+                <div class="table-scroll" th:if="${!#lists.isEmpty(transaktionen)}">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Datum</th>
+                            <th>Typ</th>
+                            <th>Kategorie</th>
+                            <th>Betrag</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="t : ${transaktionen}">
+                            <td th:text="${#temporals.format(t.datum, 'dd.MM.yyyy HH:mm')}">01.01.2026 12:00</td>
+                            <td th:text="${t.typ}">EINNAHME</td>
+                            <td th:text="${t.kathegorie.anzeigeName}">Gehalt</td>
+                            <td class="amount"
+                                th:classappend="${werte[t.id] >= 0 ? 'positive' : 'negative'}"
+                                th:text="${werte[t.id]} + ' €'">0 €</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="empty-state" th:if="${#lists.isEmpty(transaktionen)}">
+                    <strong>Noch keine Transaktionen vorhanden.</strong>
+                    <p>Sobald du Einnahmen oder Ausgaben anlegst, erscheinen sie hier in der Liste.</p>
+                </div>
             </section>
         </div>
     </main>
