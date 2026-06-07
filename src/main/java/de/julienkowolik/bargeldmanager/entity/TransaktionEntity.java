@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table
 public class TransaktionEntity {
 
     @Id
@@ -27,7 +26,7 @@ public class TransaktionEntity {
 
     private Kategorie kathegorie;
 
-    @OneToMany(mappedBy = "transaktion")
+    @OneToMany(mappedBy = "transaktion", cascade = CascadeType.ALL)
     private List<TransaktionsBargeldEntity> bargeld = new ArrayList<>();
 
 

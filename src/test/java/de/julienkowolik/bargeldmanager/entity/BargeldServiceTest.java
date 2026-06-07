@@ -1,11 +1,14 @@
 package de.julienkowolik.bargeldmanager.entity;
 
 import de.julienkowolik.bargeldmanager.model.BargeldArt;
+import de.julienkowolik.bargeldmanager.model.Kategorie;
 import de.julienkowolik.bargeldmanager.model.TransaktionsTyp;
 import de.julienkowolik.bargeldmanager.service.BargeldService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 import java.util.Map;
 
@@ -176,6 +179,200 @@ public class BargeldServiceTest {
         boolean hatGenugBargeld = bargeldService.hatGenugBargeld(depot, ausgabe);
 
         assertThat(hatGenugBargeld).isFalse();
+    }
+    private final BargeldService service = new BargeldService();
+
+    @Test
+    void berechnetBargeldWert() {
+        TransaktionsBargeldEntity bargeld =
+                new TransaktionsBargeldEntity(BargeldArt.EURO_50, 2, null);
+
+        int wert = service.berechneBargeldWert(bargeld);
+
+        assertThat(wert).isEqualTo(100);
+    }
+
+    @Test
+    void berechnetEinnahmeTransaktionsWertPositiv() {
+        TransaktionEntity einnahme = transaktion(
+                TransaktionsTyp.EINNAHME,
+                Kategorie.GEHALT,
+                LocalDateTime.of(2026, 6, 7, 12, 0),
+                bargeld(BargeldArt.EURO_50, 2),
+                bargeld(BargeldArt.EURO_20, 3)
+        );
+
+        int wert = service.berechneTransaktionsWert(einnahme);
+
+        assertThat(wert).isEqualTo(160);
+    }
+
+    @Test
+    void berechnetAusgabeTransaktionsWertNegativ() {
+        TransaktionEntity ausgabe = transaktion(
+                TransaktionsTyp.AUSGABE,
+                Kategorie.GAMING,
+                LocalDateTime.of(2026, 6, 7, 12, 0),
+                bargeld(BargeldArt.EURO_50, 1),
+                bargeld(BargeldArt.EURO_20, 1)
+        );
+
+        int wert = service.berechneTransaktionsWert(ausgabe);
+
+        assertThat(wert).isEqualTo(-70);
+    }
+
+    @Test
+    void berechnetDepotWertAusEinnahmenUndAusgaben() {
+        DepotEntity depot = depotMit(
+                transaktion(TransaktionsTyp.EINNAHME, Kategorie.GEHALT,
+                        LocalDateTime.of(2026, 6, 7, 12, 0),
+                        bargeld(BargeldArt.EURO_100, 2)),
+                transaktion(TransaktionsTyp.AUSGABE, Kategorie.GAMING,
+                        LocalDateTime.of(2026, 6, 7, 13, 0),
+                        bargeld(BargeldArt.EURO_50, 1))
+        );
+
+        int wert = service.berechneDepotWert(depot);
+
+        assertThat(wert).isEqualTo(150);
+    }
+
+    @Test
+    void berechnetBestandNachScheinen() {
+        DepotEntity depot = depotMit(
+                transaktion(TransaktionsTyp.EINNAHME, Kategorie.GEHALT,
+                        LocalDateTime.now(),
+                        bargeld(BargeldArt.EURO_50, 2),
+                        bargeld(BargeldArt.EURO_20, 3)),
+                transaktion(TransaktionsTyp.AUSGABE, Kategorie.GAMING,
+                        LocalDateTime.now(),
+                        bargeld(BargeldArt.EURO_50, 1),
+                        bargeld(BargeldArt.EURO_20, 2))
+        );
+
+        Map<BargeldArt, Integer> bestand = service.berechneBestand(depot);
+
+        assertThat(bestand.get(BargeldArt.EURO_50)).isEqualTo(1);
+        assertThat(bestand.get(BargeldArt.EURO_20)).isEqualTo(1);
+    }
+
+    @Test
+    void erkenntWennGenugBargeldVorhandenIst() {
+        DepotEntity depot = depotMit(
+                transaktion(TransaktionsTyp.EINNAHME, Kategorie.GEHALT,
+                        LocalDateTime.now(),
+                        bargeld(BargeldArt.EURO_50, 2))
+        );
+
+        TransaktionEntity ausgabe = transaktion(
+                TransaktionsTyp.AUSGABE,
+                Kategorie.GAMING,
+                LocalDateTime.now(),
+                bargeld(BargeldArt.EURO_50, 1)
+        );
+
+        assertThat(service.hatGenugBargeld(depot, ausgabe)).isTrue();
+    }
+
+    @Test
+    void erkenntWennNichtGenugBargeldVorhandenIst() {
+        DepotEntity depot = depotMit(
+                transaktion(TransaktionsTyp.EINNAHME, Kategorie.GEHALT,
+                        LocalDateTime.now(),
+                        bargeld(BargeldArt.EURO_50, 1))
+        );
+
+        TransaktionEntity ausgabe = transaktion(
+                TransaktionsTyp.AUSGABE,
+                Kategorie.GAMING,
+                LocalDateTime.now(),
+                bargeld(BargeldArt.EURO_50, 2)
+        );
+
+        assertThat(service.hatGenugBargeld(depot, ausgabe)).isFalse();
+    }
+
+    @Test
+    void berechnetAusgabenNachKategorie() {
+        DepotEntity depot = depotMit(
+                transaktion(TransaktionsTyp.AUSGABE, Kategorie.GAMING,
+                        LocalDateTime.now(),
+                        bargeld(BargeldArt.EURO_50, 1)),
+                transaktion(TransaktionsTyp.AUSGABE, Kategorie.GAMING,
+                        LocalDateTime.now(),
+                        bargeld(BargeldArt.EURO_20, 1)),
+                transaktion(TransaktionsTyp.AUSGABE, Kategorie.LEBENSMITTEL,
+                        LocalDateTime.now(),
+                        bargeld(BargeldArt.EURO_10, 2))
+        );
+
+        Map<Kategorie, Integer> ausgaben =
+                service.berechneAusgabenNachKategorie(depot);
+
+        assertThat(ausgaben.get(Kategorie.GAMING)).isEqualTo(-70);
+        assertThat(ausgaben.get(Kategorie.LEBENSMITTEL)).isEqualTo(-20);
+    }
+
+    @Test
+    void berechnetMonatsEinnahmenUndAusgaben() {
+        DepotEntity depot = depotMit(
+                transaktion(TransaktionsTyp.EINNAHME, Kategorie.GEHALT,
+                        LocalDateTime.of(2026, 6, 7, 12, 0),
+                        bargeld(BargeldArt.EURO_100, 1)),
+                transaktion(TransaktionsTyp.AUSGABE, Kategorie.GAMING,
+                        LocalDateTime.of(2026, 6, 8, 12, 0),
+                        bargeld(BargeldArt.EURO_20, 1)),
+                transaktion(TransaktionsTyp.EINNAHME, Kategorie.GEHALT,
+                        LocalDateTime.of(2026, 7, 1, 12, 0),
+                        bargeld(BargeldArt.EURO_50, 1))
+        );
+
+        assertThat(service.berechneMonatsEinnahmen(depot, 2026, Month.JUNE))
+                .isEqualTo(100);
+
+        assertThat(service.berechneMonatsAusgaben(depot, 2026, Month.JUNE))
+                .isEqualTo(-20);
+    }
+
+    private DepotEntity depotMit(TransaktionEntity... transaktionen) {
+        DepotEntity depot = new DepotEntity("Testdepot");
+
+        for (TransaktionEntity transaktion : transaktionen) {
+            transaktion.setDepot(depot);
+            depot.addTransaktion(transaktion);
+        }
+
+        return depot;
+    }
+
+    private TransaktionEntity transaktion(
+            TransaktionsTyp typ,
+            Kategorie kategorie,
+            LocalDateTime datum,
+            TransaktionsBargeldEntity... bargeld
+    ) {
+        TransaktionEntity transaktion = new TransaktionEntity();
+        transaktion.setTyp(typ);
+        transaktion.setKathegorie(kategorie);
+        transaktion.setDatum(datum);
+
+        List<TransaktionsBargeldEntity> bargeldListe = List.of(bargeld);
+
+        for (TransaktionsBargeldEntity b : bargeldListe) {
+            b.setTransaktion(transaktion);
+        }
+
+        transaktion.setBargeld(bargeldListe);
+
+        return transaktion;
+    }
+
+    private TransaktionsBargeldEntity bargeld(
+            BargeldArt art,
+            int anzahl
+    ) {
+        return new TransaktionsBargeldEntity(art, anzahl, null);
     }
 }
 

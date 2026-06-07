@@ -1,10 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-$END$
+
+<main class="main" style="margin-left:0; width:100%;">
+    <section class="hero">
+        <img src="/images/logo.png" alt="Logo">
+        <div>
+            <h1>Bargeld<span>Manager</span></h1>
+            <p>Einloggen</p>
+        </div>
+    </section>
+
+    <div class="content">
+        <section class="card">
+            <h2>Login</h2>
+
+            <form method="post" th:action="@{/login}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                <label>Name</label>
+                <input type="text" name="username" placeholder="Benutzername">
+
+                <label>Passwort</label>
+                <input type="password" name="password" placeholder="Passwort">
+
+                <button type="submit">Einloggen</button>
+            </form>
+
+            <p>Noch kein Konto? <a th:href="@{/registrieren}">Registrieren</a></p>
+        </section>
+    </div>
+</main>
+
 </body>
 </html>

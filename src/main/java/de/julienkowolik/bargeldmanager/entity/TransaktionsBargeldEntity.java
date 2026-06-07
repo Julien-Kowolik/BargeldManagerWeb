@@ -5,8 +5,9 @@ import jakarta.persistence.*;
 
 @Entity
 public class TransaktionsBargeldEntity {
-
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @Enumerated(EnumType.STRING)
     private BargeldArt art;
 
@@ -50,6 +51,9 @@ public class TransaktionsBargeldEntity {
 
     public TransaktionEntity getTransaktion() {
         return transaktion;
+    }
+    public void setTransaktion(TransaktionEntity transaktion) {
+        this.transaktion = transaktion;
     }
 
 }

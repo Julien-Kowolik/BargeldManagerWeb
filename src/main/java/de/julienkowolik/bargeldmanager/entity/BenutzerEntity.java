@@ -8,16 +8,16 @@ public class BenutzerEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String passwort;
+    private String passwortHash;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private DepotEntity depot;
 
     protected BenutzerEntity() {}
 
     public BenutzerEntity(String name, String passwort) {
         this.name = name;
-        this.passwort = passwort;
+        this.passwortHash = passwort;
         this.depot = new DepotEntity("Mein Depot");
     }
 
@@ -28,8 +28,8 @@ public class BenutzerEntity {
     public String getName() {
         return name;
     }
-    public String getPasswort() {
-        return passwort;
+    public String getPasswortHash() {
+        return passwortHash;
     }
     public DepotEntity getDepot() {
         return depot;
@@ -39,8 +39,8 @@ public class BenutzerEntity {
     public void setName(String name) {
         this.name = name;
     }
-    public void setPasswort(String passwort) {
-        this.passwort = passwort;
+    public void setPasswortHash(String passwortHash) {
+        this.passwortHash = passwortHash;
     }
     public void setDepot(DepotEntity depo) {
         this.depot = depo;

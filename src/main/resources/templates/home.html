@@ -1,10 +1,140 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>BargeldManager</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-$END$
+
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <img src="/images/logo.png" alt="BargeldManager Logo">
+            <h2>Bargeld<span>Manager</span></h2>
+        </div>
+
+        <hr class="sidebar-line">
+
+        <nav>
+            <a class="active" th:href="@{/}">🏠 Startseite</a>
+            <a th:href="@{/depot}">💼 Depot</a>
+            <a th:href="@{/transaktion/neu}">➕ Neue Transaktion</a>
+            <a th:href="@{/transaktionen}">📋 Transaktionen</a>
+            <a th:href="@{/analyse}">📊 Analyse</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <form th:action="@{/logout}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit">Logout</button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main">
+
+        <div class="topbar">
+            <div class="user-badge">👤 Willkommen!</div>
+        </div>
+
+        <section class="hero">
+            <img src="/images/logo.png" alt="BargeldManager Logo">
+            <div>
+                <h1>Bargeld<span>Manager</span></h1>
+                <p>Dein Überblick über dein Bargeld.</p>
+            </div>
+        </section>
+
+        <div class="content">
+
+            <section class="stats">
+                <div class="stat-card">
+                    <div class="stat-icon icon-blue">💼</div>
+                    <div>
+                        <small>Depotwert</small>
+                        <strong th:text="${depotWert} + ' €'">0 €</strong>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon icon-green">↗</div>
+                    <div>
+                        <small>Gesamteinnahmen</small>
+                        <strong class="positive" th:text="${gesamtEinnahmen} + ' €'">0 €</strong>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon icon-red">↘</div>
+                    <div>
+                        <small>Gesamtausgaben</small>
+                        <strong class="negative" th:text="${gesamtAusgaben} + ' €'">0 €</strong>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon icon-purple">◔</div>
+                    <div>
+                        <small>Aktueller Saldo</small>
+                        <strong th:text="${depotWert} + ' €'">0 €</strong>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-grid">
+
+                <div class="panel">
+                    <h2>💼 Bestand nach Scheinen</h2>
+
+                    <div class="cash-row" th:each="eintrag : ${bestand}">
+                        <span th:text="${eintrag.key.wert} + ' €'">50 €</span>
+                        <div class="bar">
+                            <div class="bar-fill"
+                                 th:style="'width:' + (${eintrag.value} * 20) + '%'">
+                            </div>
+                        </div>
+                        <span th:text="${eintrag.value} + ' Stück'">0 Stück</span>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>⚡ Schnelle Aktionen</h2>
+
+                    <div class="quick-actions">
+                        <a class="quick-button blue" th:href="@{/transaktion/neu}">➕<br>Neue Einnahme</a>
+                        <a class="quick-button green" th:href="@{/transaktion/neu}">➖<br>Neue Ausgabe</a>
+                        <a class="quick-button purple" th:href="@{/transaktionen}">📋<br>Alle Transaktionen</a>
+                        <a class="quick-button orange" th:href="@{/analyse}">📊<br>Analyse anzeigen</a>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>🕘 Letzte Transaktionen</h2>
+
+                    <div class="transaction-item" th:each="t : ${letzteTransaktionen}">
+                        <div>
+                            <strong th:text="${t.kathegorie.anzeigeName}">Kategorie</strong>
+                            <small th:text="${#temporals.format(t.datum, 'dd.MM.yyyy')}">07.06.2026</small>
+                        </div>
+                        <strong th:text="${werte[t.id]} + ' €'">0 €</strong>
+                    </div>
+
+                    <a class="panel-link" th:href="@{/transaktionen}">Alle anzeigen →</a>
+                </div>
+
+            </section>
+
+            <div class="footer">
+                <strong>BargeldManager</strong> – Einfach. Übersichtlich. Effizient.
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
 </body>
 </html>

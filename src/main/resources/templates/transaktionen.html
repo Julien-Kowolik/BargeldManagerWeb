@@ -1,10 +1,74 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>Transaktionen</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-$END$
+
+<div class="app">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <img src="/images/logo.png" alt="Logo">
+            <h2>Bargeld<span>Manager</span></h2>
+        </div>
+
+        <hr class="sidebar-line">
+
+        <nav>
+            <a th:href="@{/}">🏠 Startseite</a>
+            <a th:href="@{/depot}">💼 Depot</a>
+            <a th:href="@{/transaktion/neu}">➕ Neue Transaktion</a>
+            <a class="active" th:href="@{/transaktionen}">📋 Transaktionen</a>
+            <a th:href="@{/analyse}">📊 Analyse</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <form th:action="@{/logout}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit">Logout</button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <div class="user-badge">📋 Transaktionen</div>
+        </div>
+
+        <section class="hero">
+            <img src="/images/logo.png" alt="Logo">
+            <div>
+                <h1>Alle <span>Transaktionen</span></h1>
+                <p>Alle Einnahmen und Ausgaben im Überblick.</p>
+            </div>
+        </section>
+
+        <div class="content">
+            <section class="card">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Typ</th>
+                        <th>Kategorie</th>
+                        <th>Wert</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="t : ${transaktionen}">
+                        <td th:text="${#temporals.format(t.datum, 'dd.MM.yyyy HH:mm')}">01.01.2026</td>
+                        <td th:text="${t.typ}">EINNAHME</td>
+                        <td th:text="${t.kathegorie.anzeigeName}">Gehalt</td>
+                        <td th:text="${werte[t.id]} + ' €'">0 €</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+</div>
+
 </body>
 </html>
