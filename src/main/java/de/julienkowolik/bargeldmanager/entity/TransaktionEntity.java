@@ -24,6 +24,7 @@ public class TransaktionEntity {
     @JoinColumn(name = "depot_id")
     private DepotEntity depot;
 
+    @Enumerated(EnumType.STRING)
     private Kategorie kathegorie;
 
     @OneToMany(mappedBy = "transaktion", cascade = CascadeType.ALL)
